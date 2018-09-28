@@ -9,7 +9,6 @@ output:
 ---
 
 
-
 ```{r, echo=FALSE}
 require("knitr")
 stataexe <- "/Applications/Stata/StataSE.app/Contents/MacOS/stata-se"
