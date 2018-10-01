@@ -1,16 +1,18 @@
 ---
 title: "Problem set#1"
-author: "Sebastian"
+author: "Sebastian Ellingsen"
 date: "9/27/2018"
 output:
   ioslides_presentation:
     widescreen: true
     smaller: true
+
 ---
 
 
 ```{r, echo=FALSE}
 require("knitr")
+require("Statamarkdown")
 stataexe <- "/Applications/Stata/StataSE.app/Contents/MacOS/stata-se"
 opts_chunk$set(engine.path=stataexe)
 ```
@@ -22,13 +24,12 @@ opts_chunk$set(engine.path=stataexe)
 
 
 
-
 ## Determinants of internet shopping
 
 Description:
 
-- Stata data set: TIC_2012.dta
-- Source: Survey on Equipment and Use of ICT in Spanish Households 2012
+- **Stata data set**: TIC_2012.dta
+- **Source**: Survey on Equipment and Use of ICT in Spanish Households 2012
 (Encuesta sobre equipamiento y uso de TIC en los hogares 2012, INE)
 - N= 12003 
 
@@ -39,24 +40,26 @@ We are interested in estimating an equation to explain the probability of intern
 
 Variables:
 
-- gender: 1= Male, 6=Female
-- age: Number of years
-- nation: Nationality (1=Spanish, 2=Foreigner, 3=Double nationality)
-- education: 1=Primary school or less, 2=Secondary school (first level), 3=Secondary school (second level), 4=Post-secondary school, 5=University degree)
-- lab_st: Labour force status (1=Employee, 2=Self-employed, 3=Unemployed, 4=Student, 5=Retired, 6=House work, 7=Other)
-- income: Monthly household income (1=Less than 1100€, 2=1100€-1800€, 3=1801€-2700€, 4=More than 2700€)
-- pc: PC availability (1=Yes, 6=No)
-- internet: Internet connection at home (1=Yes, 6=No)
-- shopping_e: Internet shopping (1=Yes, 6=No)
+- **gender**: 1= Male, 6=Female
+- **age**: Number of years
+- **nation**: Nationality (1=Spanish, 2=Foreigner, 3=Double nationality)
+- **education**: 1=Primary school or less, 2=Secondary school (first level), 3=Secondary school (second level), 4=Post-secondary school, 5=University degree)
+- **lab_st**: Labour force status (1=Employee, 2=Self-employed, 3=Unemployed, 4=Student, 5=Retired, 6=House work, 7=Other)
+- **income**: Monthly household income (1= < 1100€, 2=1100€-1800€, 3=1801€-2700€, 4= > 2700€)
+- **pc**: PC availability (1=Yes, 6=No)
+- **internet**: Internet connection at home (1=Yes, 6=No)
+- **shopping_e**: Internet shopping (1=Yes, 6=No)
 
 ## Summary statistics {.smaller}
-```{stata example, echo=TRUE, autodep = TRUE}
+```{stata example, echo=TRUE, collectcode=TRUE}
 use TIC_2012.dta,clear
 sum
 ```
 
+
+
 ## Defining variables {.smaller}
-```{stata, echo=TRUE, results='hide'}
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 gen byte d_male = 0 
 replace d_male = 1 if gender==1 
 gen byte d_female = gender==6 
@@ -85,8 +88,19 @@ Compare the relative frequencies in a two-way table relating gender and the vari
 
 
 
-## Q1
-```{stata, echo=FALSE}
+## Q1 - solution
+
+
+Comparisons of two-way tables and discrete choice model estimates.
+
+The frequency distribution of the table is compared
+between *gender* and *d_shopping* with the odds adjusted by
+to the three models and see that in this particular case the three
+Models predict the same probabilities that they match
+with the proportion of observations that make purchases over the internet
+between men and female respondents respectively.
+
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 tab gender d_shopping, row
 reg d_shopping d_male
 predict p_ls
@@ -94,6 +108,10 @@ probit d_shopping d_male
 predict p_prob
 logit d_shopping d_male
 predict p_log
+```
+
+## Q1 - solution
+```{stata, echo=TRUE, collectcode=TRUE}
 sum p_ls p_prob p_log if d_male==1
 sum p_ls p_prob p_log if d_male==0
 drop p_ls p_prob p_log
@@ -104,106 +122,113 @@ drop p_ls p_prob p_log
 
 Using the previous model check that the results are the same if the dependent variable is defined in the opposite way, i.e. the model is explaining the probability of not shopping in internet.
 
-## Q3
-Add education as an additional explanatory factor and check that the interpretation of the results and the model do not change if we use different reference categories for the gender and education dummies.
 
-## Q4
-With the previous specification compare the three discrete choice models by analyzing the predicted probabilities.
+## Q2 - solution
 
-## Q5
-Using only the Probit and the Logit models, estimate a general model of the decision of shopping in internet including also the other variables in the data set. Interpret the results. Compare both models in terms of the estimated coefficients, the marginal effects, the adjusted probabilities and the different selection criteria. Test the significance of the coefficients of the explanatory variables (the groups of dummies).
+Check if the results are the same if we use *d_noshopping* as the dependent variable.
 
-
-## Slide with Bullets
-
-- Bullet 1
-- Bullet 2
-- Bullet 3
-
-## Slide with R Output
-
-```{r cars, echo = TRUE}
-summary(cars)
-```
-
-## Slide with Plot
-
-```{r pressure}
-plot(pressure)
-```
-
-
-
-
-
-
-/* QUESTION 2
-   CHECK THAT THE RESULTS ARE THE SAME
-   IF WE USE d_noshopping AS THE DEPENDENT VARIABLE */
-   
-
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 reg d_noshopping d_male
 predict p_ls
 probit d_noshopping d_male
 predict p_prob
 logit d_noshopping d_male
 predict p_log
+```
+
+## Q2 - solution
+```{stata, echo=TRUE}
 sum p_ls p_prob p_log if d_male==1
 sum p_ls p_prob p_log if d_male==0
-
 drop p_ls p_prob p_log
+```
 
-/* QUESTION 3
-   ADD EDUCATION AS AN EXPLANATORY VARIABLE AND
-   CHECK THAT RESULTS ARE THE SAME INDEPENDENTLY OF
-   THE REFERENCE CATEGORY */
-   
 
+## Q3
+Add education as an additional explanatory factor and check that the interpretation of the results and the model do not change if we use different reference categories for the gender and education dummies.
+
+
+
+## Q3 - solution
+
+Add eduacation as an explanatory variable and check that the results are the same independentlu of the reference category.
+
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 reg d_shopping d_male d_estud2-d_estud5
 probit d_shopping d_male d_estud2-d_estud5
 logit d_shopping d_male d_estud2-d_estud5
+```
+
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 reg d_shopping d_female d_estud1-d_estud4
 probit d_shopping d_female d_estud1-d_estud4
 logit d_shopping d_female d_estud1-d_estud4
+```
 
-/* QUESTION 4
-   COMPARISON OF THE THREE MODELS 
-   (Linear Probability, Probit and Logit) */
+
+
+## Q4
+With the previous specification compare the three discrete choice models by analyzing the predicted probabilities.
+
+
+## Q4 - solution
+
+Comparison of the three models (Linear Probability, Probit and Logit)
    
 
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
+drop p_ls p_prob p_log
 reg d_shopping d_male d_estud2-d_estud5
 predict p_ls
 probit d_shopping d_male d_estud2-d_estud5
 predict p_prob
 logit d_shopping d_male d_estud2-d_estud5
 predict p_log
+```
+
+```{stata, echo=TRUE, collectcode=TRUE}
 sum p_ls p_prob p_log 
 
 drop p_ls p_prob p_log
 
-/* QUESTION 5
-   ESTIMATION OF A GENERAL MODEL using Probit and Logit
-   COMPARISON OF THE ESTIMATION RESULTS AND THE MARGINAL EFFECTS */
+```
 
-   
 
+
+## Q5
+Using only the Probit and the Logit models, estimate a general model of the decision of shopping in internet including also the other variables in the data set. Interpret the results. Compare both models in terms of the estimated coefficients, the marginal effects, the adjusted probabilities and the different selection criteria. Test the significance of the coefficients of the explanatory variables (the groups of dummies).
+
+
+
+## Q5 - solution
+
+Estimation of a general model using logit and probit and comparison of the marginal effects.
+
+```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 probit d_shopping d_male age agesq  /*
        */ d_estud2-d_estud5 d_income2-d_income4 /*
        */ d_pc d_internet 
 
 predict p_prob 
 
-
 gen d_shopping_p = p_prob>0.5
 tab d_shopping d_shopping_p, cell
-
  
 gen w_res_prob=((d_shopping-p_prob)^2)/(p_prob*(1-p_prob)) 
 tabstat w_res_prob, stats(sum) 
+```
 
+
+```{stata, echo=TRUE, collectcode=TRUE}
 test d_estud2 d_estud3 d_estud4 d_estud5 
 
 
+```
+   
+   
+## Q5 - solution
+
+```{stata, echo=TRUE, collectcode=TRUE}
 
 probit d_shopping i.gender c.age##c.age i.education /*
        */ i.income i.pc i.internet
@@ -217,6 +242,13 @@ logit d_shopping d_male age agesq   /*
        */ d_pc d_internet
 
 
+```
+
+   
+## Q5 - solution
+
+```{stata, echo=TRUE, collectcode=TRUE}
+
 predict p_log 
 gen d_shopping_l = p_log>0.5
 tab d_shopping d_shopping_l, cell
@@ -228,6 +260,19 @@ tabstat w_res_log, stats(sum)
 sum p_prob p_log 
 corr p_prob p_log 
 list p_prob p_log if _n<11 
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
