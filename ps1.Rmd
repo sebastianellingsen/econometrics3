@@ -57,7 +57,7 @@ sum
 ```
 
 
-
+ 
 ## Defining variables {.smaller}
 ```{stata, echo=TRUE, results='hide', collectcode=TRUE}
 gen byte d_male = 0 
