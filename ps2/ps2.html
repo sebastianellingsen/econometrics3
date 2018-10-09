@@ -3110,44 +3110,81 @@ if (document.readyState !== "loading" &&
           </hgroup>
   </slide>
 
-<slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Recap</h2></hgroup><article  class="smaller " id="recap">
+<slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Recap</h2></hgroup><article  id="recap" class="smaller ">
 
-</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Dataset</h2></hgroup><article  class="smaller " id="dataset">
+</article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Dataset</h2></hgroup><article  id="dataset" class="smaller ">
 
-</article></slide><slide class=""><hgroup><h2>Determinants of internet shopping</h2></hgroup><article  class="smaller " id="determinants-of-internet-shopping">
-
-<p>Description:</p>
+</article></slide><slide class=""><hgroup><h2>Determinants of internet shopping</h2></hgroup><article  id="determinants-of-internet-shopping" class="smaller ">
 
 <ul>
-<li><strong>Stata data set</strong>: TIC_2012.dta</li>
-<li><strong>Source</strong>: Survey on Equipment and Use of ICT in Spanish Households 2012 (Encuesta sobre equipamiento y uso de TIC en los hogares 2012, INE)</li>
+<li><strong>Stata data set</strong>: enquesta2009-2018.dta</li>
+<li><strong>Source</strong>: Survey on transport mode choices for UPF undergraduates attending Econometricslll in the period 2009-2018</li>
 <li>N= 12003</li>
 </ul>
 
-<p>We are interested in estimating an equation to explain the probability of internet shopping (shopping_e is the dependent variable) using the other variables as potential explanatory factors.</p>
+<p>We want to estimate a multinomial discrete choice model to analyse the determinants of the transportation mode used by university students.</p>
 
-</article></slide><slide class=""><hgroup><h2>Encuesta sobre equipamiento y uso de TIC en los hogares 2012</h2></hgroup><article  class="smaller " id="encuesta-sobre-equipamiento-y-uso-de-tic-en-los-hogares-2012">
+</article></slide><slide class=""><hgroup><h2>Survey on transport mode choices 2009-2018</h2></hgroup><article  id="survey-on-transport-mode-choices-2009-2018" class="smaller ">
 
-<p>Variables:</p>
-
-<ul>
-<li><strong>gender</strong>: 1= Male, 6=Female</li>
-<li><strong>age</strong>: Number of years</li>
-<li><strong>nation</strong>: Nationality (1=Spanish, 2=Foreigner, 3=Double nationality)</li>
-<li><strong>education</strong>: 1=Primary school or less, 2=Secondary school (first level), 3=Secondary school (second level), 4=Post-secondary school, 5=University degree)</li>
-<li><strong>lab_st</strong>: Labour force status (1=Employee, 2=Self-employed, 3=Unemployed, 4=Student, 5=Retired, 6=House work, 7=Other)</li>
-<li><strong>income</strong>: Monthly household income (1= &lt; 1100€, 2=1100€-1800€, 3=1801€-2700€, 4= &gt; 2700€)</li>
-<li><strong>pc</strong>: PC availability (1=Yes, 6=No)</li>
-<li><strong>internet</strong>: Internet connection at home (1=Yes, 6=No)</li>
-<li><strong>shopping_e</strong>: Internet shopping (1=Yes, 6=No)</li>
-</ul>
-
-</article></slide><slide class=""><hgroup><h2>Summary statistics</h2></hgroup><article  class="smaller smaller" id="summary-statistics">
+</article></slide><slide class=""><hgroup><h2>Summary statistics</h2></hgroup><article  id="summary-statistics" class="smaller smaller">
 
 <p>Summarize the data using <em>sum</em></p>
 
 <pre class = 'prettyprint lang-stata'>use TIC_2012.dta,clear
-sum</pre></article></slide>
+sum</pre>
+
+<p>clear all capture log close log using llista2.log,replace use enquesta2009-2018,clear</p>
+
+<p>la def labb 1 &ldquo;metro&rdquo; 2 &ldquo;bus&rdquo; 3 &ldquo;tram&rdquo; 4 &ldquo;cotxe&rdquo; 5 &ldquo;peu&rdquo; 6 &ldquo;bici&rdquo; 7 &ldquo;moto&rdquo; 8 &ldquo;tren&rdquo; la val transport labb</p>
+
+<p>sum</p>
+
+<ul>
+<li>A: descripcio de variables tab1 edat genere transport distancia universitat carrera curs treballa educa_pare educa_mare</li>
+</ul>
+
+<p><em>histogram transport, percent discrete by(year) start(1) addlabels histogram transport, percent discrete by(year) start(1) /</em> <em>/ xlabels(1 &ldquo;metro&rdquo; 2 &ldquo;bus&rdquo; 3 &ldquo;tram&rdquo; 4 &ldquo;cotxe&rdquo; 5 &ldquo;peu&rdquo; 6 &ldquo;bici&rdquo; 7 &ldquo;moto&rdquo; 8 &ldquo;tren&rdquo;, angle(45)) /</em> graph export transport.pdf,replace */</p>
+
+<ul>
+<li><p>generacio de variables gen upf=univ==1 gen ldistancia=log(distancia) gen dona=genere==2 replace year=year-2008</p></li>
+<li><p>APARTAT B:</p></li>
+</ul>
+
+<p>tab transport mlogit transport, baseoutcome(1) predict p1 p2 p3 p4 p5 p6 p7 p8 /* una variable per cada outcome */ sum p1-p8</p>
+
+<p>*Note: it’s common to choose the most frequent outcome as the baseoutcome</p>
+
+<p>*Predict the choices just as a function of a constant, can do better than just guessing the mean with more variables.</p>
+
+<ul>
+<li>APARTAT C:</li>
+</ul>
+
+<p>mlogit transport edat i.dona i.upf ldistancia year, baseoutcome(1) estimates store t1</p>
+
+<p>mlogit transport edat i.dona i.upf ldistancia year if transport!=4, baseoutcome(1) estimates store t1p</p>
+
+<p>hausman t1p t1, constant alleqs</p>
+
+<ul>
+<li>APARTAT D:</li>
+</ul>
+
+<p>mlogit transport edat i.dona i.upf ldistancia year, baseoutcome(1) margins, dydx(edat dona upf ldistancia) tab transport margins, dydx(ldistancia) pr(out(5)) margins, dydx(ldistancia) pr(out(8)) *Walking and train is very sensitive to distance.</p>
+
+<p>margins, dydx(edat dona upf ldistancia) predict(outcome(2)) margins, dydx(edat dona upf ldistancia) predict(outcome(3)) margins, dydx(edat dona upf ldistancia) predict(outcome(4)) margins, dydx(edat dona upf ldistancia) predict(outcome(5)) margins, dydx(edat dona upf ldistancia) predict(outcome(6)) margins, dydx(edat dona upf ldistancia) predict(outcome(7)) margins, dydx(edat dona upf ldistancia) predict(outcome(8))</p>
+
+<p>mlogit transport edat i.dona i.upf ldistancia i.year, baseoutcome(1) margins, dydx(*)</p>
+
+<p>*APARTAT E</p>
+
+<p>gen public=transport recode public 1 2 3 8=1 4 5 6 7 =0 gen medi=transport recode medi 1 2 3 8=1 4 7=2 5 6=3</p>
+
+<p>logit public edat dona upf ldistancia year margins, dydx(*)</p>
+
+<p>mlogit medi edat dona upf ldistancia year, baseoutcome(1) margins, dydx(*)</p>
+
+<p>mlogit transport edat i.dona i.upf ldistancia i.year, baseoutcome(1) margins, dydx(*)</p></article></slide>
 
 
   <slide class="backdrop"></slide>
