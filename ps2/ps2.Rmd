@@ -36,8 +36,6 @@ opts_chunk$set(engine.path=stataexe, message=FALSE, warning=FALSE)
 
 ## Determinants of internet shopping
 
-Description:
-
 - **Stata data set**: enquesta2009-2018.dta
 - **Source**: Survey on transport mode choices for UPF undergraduates attending Econometricslll in the period 2009-2018
 - N= 12003 
