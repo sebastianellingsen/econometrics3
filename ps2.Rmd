@@ -4,7 +4,7 @@ subtitle: Econometrics lll
 author: Sebastian Ellingsen
 institute: Department of Economics
 titlegraphic: /Dropbox/teaching/clemson-academic.png
-fontsize: 10pt
+fontsize: 10pt 
 output:
  ioslides_presentation:
     smaller: true
